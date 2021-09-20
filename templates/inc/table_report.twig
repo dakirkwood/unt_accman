@@ -1,0 +1,26 @@
+<h4 class="report-title">Tables</h4>
+<div id="tables" class="report-section">
+
+  {% include '@unt_accman/inc/report_summary.twig' %}
+
+    <table>
+      <thead>
+      <th class="id">ID</th>
+      <th class="tag-issue">Issue</th>
+      </thead>
+      <tbody>
+
+      {% for key,feedback in report %}
+        <tr>
+          <td class="id">{{ key }}</td>
+          <td>
+            {% for issue in feedback['issues'] %}
+              {{ issue['text'] }}<br />
+            {% endfor %}
+          </td>
+        </tr>
+      {% endfor %}
+
+      </tbody>
+    </table>
+</div>

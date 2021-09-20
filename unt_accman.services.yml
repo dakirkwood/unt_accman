@@ -1,0 +1,3 @@
+services:
+  unt_accessibility_manager:
+    class: Drupal\unt_accman\AccessibilityManager

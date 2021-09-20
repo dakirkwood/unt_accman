@@ -1,0 +1,83 @@
+
+{% if show_report == 1 %}
+  <div id="accessibility-manager" class="report">
+    <h2>Accessibility Report</h2>
+
+{# THIS TOP PART IS FOR ENFORCMENT ISSUES #}
+    {% if error_count > 0 %}
+    <section class="report-failures">
+      <h3>Errors to resolve</h3>
+
+      {% if error_count == 1 %}
+        <p><strong>{{ error_count }}</strong> issue.</p>
+      {% else %}
+        <p><strong>{{ error_count }}</strong> issues.</p>
+      {% endif %}
+
+      {% if anchor_error|length > 0 %}
+        {% include '@unt_accman/inc/anchor_report.twig' with {'summary': errors['anchor'], 'report': anchor_error} %}
+      {% endif %}
+
+      {% if header_error|length > 0 %}
+        {% include '@unt_accman/inc/header_report.twig' with {'summary': errors['headers'], 'report': header_error} %}
+      {% endif %}
+
+      {% if image_error|length > 0 %}
+        {% include '@unt_accman/inc/image_report.twig' with {'summary': errors['image'], 'report': image_error} %}
+      {% endif %}
+
+      {% if table_error|length > 0 %}
+        {% include '@unt_accman/inc/table_report.twig' with {'summary': errors['table'], 'report': table_error} %}
+      {% endif %}
+
+    </section>
+    {% endif %}
+
+    {# THIS SECTION IS FOR ISSUES THAT REQUIRE REVIEW, BUT DO NOT PREVENT PUBLISHING #}
+    {% if warning_count > 0 %}
+    <section class="report-warnings">
+      <h3>Issues to review</h3>
+
+      {% if warning_count == 1 %}
+        <p><strong>{{ warning_count }}</strong> issue.</p>
+      {% else %}
+        <p><strong>{{ warning_count }}</strong> issues.</p>
+      {% endif %}
+
+      {% if anchor_warning|length > 0 %}
+        {% include '@unt_accman/inc/anchor_report.twig' with {'summary': warnings['anchor'], 'report': anchor_warning} %}
+      {% endif %}
+
+      {% if header_warning|length > 0 %}
+        {% include '@unt_accman/inc/header_report.twig' with {'summary': warnings['headers'], 'report': header_warning} %}
+      {% endif %}
+
+      {% if image_warning|length > 0 %}
+        {% include '@unt_accman/inc/image_report.twig' with {'summary': warnings['image'], 'report': image_warning} %}
+      {% endif %}
+
+      {% if table_warning|length > 0 %}
+        {% include '@unt_accman/inc/table_report.twig' with {'summary': warnings['table'], 'report': table_warning}  %}
+      {% endif %}
+
+    </section>
+    {% endif %}
+  </div>
+{%  endif %}
+<script>
+  let report_headers = document.querySelectorAll('h4.report-title');
+  report_headers.forEach(function (header){
+    header.addEventListener('click',function(e){
+      let report = e.target.nextElementSibling;
+
+      if(report.classList.contains('open')){
+        report.style.height = 0;
+        report.classList.remove('open');
+      }else{
+        reportHeight = report.scrollHeight + 20;
+        report.style.height = reportHeight + 'px';
+        report.classList.add('open');
+      }
+    });
+  });
+</script>

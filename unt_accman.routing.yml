@@ -1,0 +1,9 @@
+unt_accman.acc_man_config:
+  path: '/admin/config/content/accessibility'
+  defaults:
+    _form: '\Drupal\unt_accman\Form\AccManConfig'
+    _title: 'AccManConfig'
+  requirements:
+    _permission: 'access administration pages'
+  options:
+    _admin_route: TRUE

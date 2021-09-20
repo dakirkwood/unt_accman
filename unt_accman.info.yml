@@ -1,0 +1,5 @@
+name: 'AccessibilityManager'
+type: module
+description: 'Provides enforcement of accessibility attributes.'
+core: 8.x
+package: 'UNT Campus'

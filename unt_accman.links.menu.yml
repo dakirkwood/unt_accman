@@ -1,0 +1,6 @@
+unt_accman.acc_man_config:
+  title: 'AccessibilityManager'
+  route_name: unt_accman.acc_man_config
+  description: 'Configure accessibility reporting and enforcement settings.'
+  parent: system.admin_config_content
+  weight: 99

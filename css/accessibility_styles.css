@@ -1,0 +1,54 @@
+p[data-test='red']{ background-color: rgba(250,0,0,.1); }
+*[data-untam-grade] { position: relative; margin-left:1.5rem; }
+img[data-untam-grade] { margin-left: 0; }
+*[data-untam-grade="PASS"] { border:2px dashed green !important; }
+*[data-untam-grade="FAIL"] { border:2px dashed red !important; }
+*[data-untam-grade="WARNING"] { border:2px dashed orange !important; }
+[data-untam-index]::before {
+  content: attr(data-untam-index);
+  position: absolute;
+  left: -1.6875rem;
+  display: inline-block;
+  background-color: blue;
+  color: #fff;
+  font-weight: bold;
+  min-width: 1.5rem;
+  text-align: center;
+  top: -.1875rem;
+  font-size: 1rem;
+  height: 1.5rem;
+}
+a[data-untfm-grade="FAIL"],
+a[data-untfm-grade="WARNING"] { display:inline-block; }
+div#accessibility-manager {background-color: rgba(200,200,200,.15); border: 3px double #333; padding:1rem; }
+div#accessibility-manager h2 { font-size: 1.625rem; }
+div#accessibility-manager h3 { border-top: 0px solid #999; font-size: 1.4375rem; padding-top: .5rem; margin-top:0; }
+div#accessibility-manager h4 { font-size: 1.1875rem; font-weight: normal; margin: .5rem .75rem; padding-top: .25rem; cursor: pointer; color:darkgreen;}
+div#accessibility-manager h4.redirect { border-top:3px solid darkorange; }
+div#accessibility-manager h4.invalid { border-top:3px solid red; }
+div#accessibility-manager h5 { margin-left: 2.25rem; margin-bottom: 0; font-size: 1rem; }
+div#accessibility-manager ul,ol { margin-left: .75rem; margin-top:.25rem; }
+div#accessibility-manager ul li { list-style: none; }
+div#accessibility-manager p { margin-left: .75rem; }
+div#accessibility-manager a.resource { color:blue; text-decoration: underline; }
+div.report-section {
+  height: 0;
+  overflow: hidden;
+  transition: height .35s;
+  border-bottom: 1px solid #ddd;
+}
+div.report-section.open { }
+
+.report table .id,
+.report table .tag { width:3rem; text-align: center; }
+.report table .inner-text { font-weight: bold; }
+.report #anchors table .inner-text { color: green; }
+.report table {
+  width: 95%;
+  margin: auto;
+  font-size: .875rem;
+  line-height: 1.5rem;
+}
+
+section.report-failures { border-top: 3px solid red; }
+section.report-warnings { border-top: 3px solid orange; margin-top: 1.5rem;}

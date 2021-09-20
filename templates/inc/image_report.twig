@@ -1,0 +1,25 @@
+<h4 class="report-title">Images</h4>
+<div id="images" class="report-section">
+
+  {% include '@unt_accman/inc/report_summary.twig' %}
+
+  </ol>
+  <table>
+    <thead>
+    <th class="id">ID</th>
+    <th class="thumbnail">Image</th>
+    <th class="tag-issue">Issue</th>
+    </thead>
+    <tbody>
+
+    {% for key,feedback in report %}
+      <tr>
+        <td class="id">{{ key }}</td>
+        <td><img src="{{ feedback['src'] }}" width="60px" height="auto" /></td>
+        <td>{{ feedback['issues'][0]['text'] }}</td>
+      </tr>
+    {% endfor %}
+
+    </tbody>
+  </table>
+</div>

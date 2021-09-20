@@ -1,0 +1,181 @@
+<?php
+
+use Drupal\unt_accman\Classes\AccessibilityManager;
+
+$accessibilityManager = null;
+
+/**
+ * Implements hook_ckeditor_css_alter().
+ * Attach the accessibility_styles.css to CKEditor
+ */
+function unt_accman_ckeditor_css_alter(array &$css, Drupal\editor\Entity\Editor $editor) {
+  $css[] = \Drupal::service('extension.list.module')->getPath('unt_accman') . '/css/accessibility_styles.css';
+}
+
+/**
+ * Implements hook_form_alter().
+ * Add the accessibility check to the form validation
+ */
+function unt_accman_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id) {
+
+  // Bail if reporting or enforcement has been disabled.
+  if( !run_report() ){ return; }
+
+  // Get the user-input for the form
+  $input = $form_state->getUserInput();
+
+  // Reference the global variable for report-block interaction
+  global $accessibilityManager;
+
+  // Test the form ID; verify it is a node_edit form.
+  if(preg_match('/node_[\w_]+_edit_form/', $form_id, $match)){
+
+    // On save, verify the user input
+    if(!empty($input) && isset($input['body'])){
+      // Process the user's input, not the original field value
+      $accessibilityManager = new AccessibilityManager($input['body'][0]['value'], 'edit');
+      // Set the form field value to the processed field value
+      $form['body']['widget'][0]['#default_value'] = $accessibilityManager->mod_body;
+    }else{
+      // Process the field
+      $accessibilityManager = new AccessibilityManager($form['body']['widget'][0]['#default_value'], 'edit');
+      // Set the field to the value of the processed field value
+      $form['body']['widget'][0]['#default_value'] = $accessibilityManager->mod_body;
+    }
+
+    // Validate the form
+    $form['#validate'][] = 'accessibility_check';
+  }
+}
+
+/**
+ * Callback to run AccessibilityManager on the modified content and set an error for issues.
+ * @param $form
+ * @param \Drupal\Core\Form\FormStateInterface $form_state
+ */
+function accessibility_check(&$form, \Drupal\Core\Form\FormStateInterface $form_state){
+
+  // Reference the global variable for report-block interaction
+  global $accessibilityManager;
+  // Get the user's field input
+  $input = $form_state->getUserInput();
+  // Instantiate a new object
+  $accessibilityManager = new AccessibilityManager( $input['body'][0]['value'], 'edit');
+  //$failed_tags = array_keys($accessibilityManager->issues);
+
+
+  // Verify if compliance enforcement is required
+  if( !empty($accessibilityManager->fail) ){
+    // Set the form error
+    $form_state->setErrorByName('body', 'Accessibility errors! Please refer to the report below.');
+    // Reprocess the field to mark the issues.
+    //$am = new AccessibilityManager( $input['body'][0]['value'], 'edit');
+    // Set the form field value to the processed value to display issues
+    $form['body']['widget'][0]['value']['#value'] = $accessibilityManager->mod_body;
+  }
+}
+
+/**
+ * Implements hook_entity_presave().
+ * If no errors were detected in validation, process the field value once more
+ * to remove the data-* attributes from the document before saving.
+ */
+function unt_accman_entity_presave(Drupal\Core\Entity\EntityInterface $entity) {
+  global $accessibilityManager;
+  // Create an array of the $entity
+  //$node = $entity->toArray();
+  if($entity->getEntityType() == 'node'){
+    // Process the field to remove the data-* attributes
+    $accessibilityManager = new AccessibilityManager( $entity->body->value, 'save' );
+    // Save the processed field value back to the $entity
+    $entity->body->value = $accessibilityManager->mod_body;
+  }
+}
+
+/**
+ * Implements hook_page_attachments().
+ * Include the accessibility feedback stylesheet to front view.
+ */
+function unt_accman_page_attachments(array &$attachments) {
+  $attachments['#attached']['library'][] = 'unt_accman/accessibility_feedback';
+}
+
+/**
+ * Implements hook_entity_view_alter().
+ * Run AccessibilityManager ahead of page display to show accessibility issues
+ */
+function unt_accman_entity_view_alter(array &$build, Drupal\Core\Entity\EntityInterface $entity, \Drupal\Core\Entity\Display\EntityViewDisplayInterface $display) {
+
+  // Bail if reporting or enforcement is turned off
+  //if(run_report() == FALSE){ return; }
+
+  if(isset($entity)){
+    // Reference the variable from the global scope
+    global $accessibilityManager;
+    // Get the node as an array
+    $node = $entity->toArray();
+    if(!empty($node['body'])){
+      // Instantiate a new object
+      $accessibilityManager = new AccessibilityManager($node['body'][0]['value'], 'view');
+      //if(!empty($accessibilityManager->issues)) {
+        // Modify the field input filter to allow the extra attributes for each tag
+        $build['body'][0]['#format'] = 'full_html';
+        // Save the modified field content to the $build array
+        $build['body'][0]['#text'] = $accessibilityManager->mod_body;
+      //}
+    }//ksm($accessibilityManager);
+  }
+}
+
+/**
+ * Helper function: Determines if running AccessibilityManger is needed.
+ */
+function run_report(){
+  // Get the accman configuration object
+  //$config = \Drupal::service('config.factory')->getEditable('accman.config');
+  $config = \Drupal::config('unt_accman.accmanconfig');
+  // Test for enforcement config
+  foreach($config->get('enforcement') as $etag){
+    if($etag != 0){
+      break;
+    }
+    return 'enforce';
+  }
+  foreach($config->get('reporting') as $rtag){
+    if($rtag != 0){
+      break;
+    }
+    return 'report';
+  }
+  // No enforcement or reporting needs to be done
+  return FALSE;
+}
+
+/**
+ * Implements hook_theme().
+ * Create empty block variables that the block plugin will set values for
+ */
+function unt_accman_theme($existing, $type, $theme, $path) {
+
+  return [
+    'accessibility_manager_block' => [
+      'variables' => [
+        'show_report' => NULL,
+        'content' => NULL,
+        'error_count' => NULL,
+        'warning_count' => NULL,
+        'errors' => NULL,
+        'warnings' => NULL,
+        'anchor_error' => NULL,
+        'anchor_warning' => NULL,
+        'header_error' => NULL,
+        'header_warning' => NULL,
+        'image_error' => NULL,
+        'image_warning' => NULL,
+        'table_error' => NULL,
+        'table_warning' => NULL,
+      ],
+      'render element' => 'children',
+    ],
+  ];
+}

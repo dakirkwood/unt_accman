@@ -1,0 +1,12 @@
+reporting:
+  - anchor
+  - header
+  - 0
+  - image
+  - table
+enforcement:
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0

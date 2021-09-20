@@ -1,0 +1,11 @@
+<h5>Summary</h5>
+<ol>
+  {%  for issue in summary %}
+    <li>
+      {{ issue['text'] }}
+      {% autoescape %}
+        {{ issue['resource']|raw }}
+      {% endautoescape %}
+    </li>
+  {%  endfor %}
+</ol>
